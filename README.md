@@ -96,4 +96,3 @@ Quando não há usuários no banco, a página de login abre o modal de criação
 
 O código é invalidado após o cadastro. Reiniciar o backend enquanto o banco está vazio gera um novo código. Também existe provisionamento do administrador pelas configurações `ADMIN_EMAIL` e `ADMIN_PASSWORD` do servidor.
 
-Para detalhes sobre as proteções implementadas e as limitações da validação, consulte [SEGURANCA.md](./SEGURANCA.md).

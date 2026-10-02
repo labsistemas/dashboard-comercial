@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Database
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/instituto_mapeando}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      # URLs (usando apenas FRONTEND_URL em produção)
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:80}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:3000}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:80}
+      # Email (SMTP ou AWS SES)
+      - EMAIL_FROM=${EMAIL_FROM:-noreply@institutomapeando.com}
+      - EMAIL_FROM_NAME=${EMAIL_FROM_NAME:-Lab Sistemas}
+      - SUPPORT_EMAIL=${SUPPORT_EMAIL:-}
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - AWS_REGION=${AWS_REGION:-}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      # Storage (S3/MinIO)
+      - STORAGE_BUCKET_NAME=${STORAGE_BUCKET_NAME:-}
+      - STORAGE_ACCESS_KEY_ID=${STORAGE_ACCESS_KEY_ID:-}
+      - STORAGE_SECRET_ACCESS_KEY=${STORAGE_SECRET_ACCESS_KEY:-}
+      - STORAGE_REGION=${STORAGE_REGION:-us-east-1}
+      - STORAGE_ENDPOINT=${STORAGE_ENDPOINT:-}
+      # Next.js Environment Variables (NEXT_PUBLIC_*)
+      - NEXT_PUBLIC_BACKEND=${BACKEND_URL:-http://localhost:3000}
+      - NEXT_PUBLIC_FRONTEND=${FRONTEND_URL:-http://localhost:80}
+    volumes:
+      - ./backend/uploads:/app/backend/uploads
+      - ./backend/logs:/app/backend/logs
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-instituto_mapeando}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  /* "Limpo & moderno": neutros frios quase sem cor, tinta escura, um único acento índigo.
+     Estrutura é neutra; cor só para ação, foco e status. Todas em HSL. */
+  :root {
+    --background: 220 20% 98%;
+    --foreground: 224 24% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 24% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 24% 10%;
+    --primary: 243 75% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 16% 95%;
+    --secondary-foreground: 224 20% 20%;
+    --muted: 220 16% 95%;
+    --muted-foreground: 220 9% 42%;
+    --accent: 220 16% 94%;
+    --accent-foreground: 224 24% 10%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 62% 33%;
+    --success-foreground: 0 0% 100%;
+    --warning: 33 92% 44%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 85% 40%;
+    --info-foreground: 0 0% 100%;
+    --border: 220 14% 91%;
+    --input: 220 13% 85%;
+    --ring: 243 75% 56%;
+    --radius: 0.625rem;
+    --gradient-primary: linear-gradient(135deg, hsl(243 75% 58%) 0%, hsl(252 70% 50%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(224 24% 12%) 0%, hsl(224 20% 18%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(152 62% 33%) 0%, hsl(152 58% 40%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(33 92% 44%) 0%, hsl(38 92% 50%) 100%);
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --shadow-ring: 0 0 0 1px hsl(224 24% 10% / 0.06);
+    --shadow-lift: 0 0 0 1px hsl(224 24% 10% / 0.06), 0 1px 2px -1px hsl(224 24% 10% / 0.06), 0 2px 6px hsl(224 24% 10% / 0.04);
+    --shadow-raised: 0 0 0 1px hsl(224 24% 10% / 0.06), 0 4px 8px -2px hsl(224 24% 10% / 0.08), 0 12px 24px -8px hsl(224 24% 10% / 0.10);
+    --sidebar-background: 220 20% 98%;
+    --sidebar-foreground: 224 10% 32%;
+    --sidebar-primary: 243 75% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 16% 94%;
+    --sidebar-accent-foreground: 224 24% 10%;
+    --sidebar-border: 220 14% 91%;
+    --sidebar-ring: 243 75% 56%;
+  }
+
+  .dark {
+    --background: 224 20% 6.5%;
+    --foreground: 220 15% 96%;
+    --card: 224 18% 9%;
+    --card-foreground: 220 15% 96%;
+    --popover: 224 18% 11.5%;
+    --popover-foreground: 220 15% 96%;
+    --primary: 243 90% 68%;
+    --primary-foreground: 224 30% 6%;
+    --secondary: 224 14% 14%;
+    --secondary-foreground: 220 15% 96%;
+    --muted: 224 14% 13%;
+    --muted-foreground: 220 9% 64%;
+    --accent: 224 14% 15%;
+    --accent-foreground: 220 15% 96%;
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 52% 50%;
+    --success-foreground: 224 30% 6%;
+    --warning: 36 90% 58%;
+    --warning-foreground: 224 30% 6%;
+    --info: 199 85% 60%;
+    --info-foreground: 224 30% 6%;
+    --border: 224 14% 17%;
+    --input: 224 14% 21%;
+    --ring: 243 90% 68%;
+    --shadow-ring: 0 0 0 1px hsl(0 0% 100% / 0.08);
+    --shadow-lift: 0 0 0 1px hsl(0 0% 100% / 0.08);
+    --shadow-raised: 0 0 0 1px hsl(0 0% 100% / 0.10), 0 12px 24px -8px hsl(0 0% 0% / 0.5);
+    --sidebar-background: 224 20% 6.5%;
+    --sidebar-foreground: 220 9% 70%;
+    --sidebar-primary: 243 90% 68%;
+    --sidebar-primary-foreground: 224 30% 6%;
+    --sidebar-accent: 224 14% 15%;
+    --sidebar-accent-foreground: 220 15% 96%;
+    --sidebar-border: 224 14% 17%;
+    --sidebar-ring: 243 90% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Instrument Sans', system-ui, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* números alinhados em tabelas, KPIs e gráficos */
+  table, .tabular, .recharts-text {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-sm border border-border/50;
+    box-shadow: var(--shadow-lift);
+  }
+  .stat-card {
+    @apply bg-card rounded-xl border border-border p-5;
+    box-shadow: var(--shadow-lift);
+    transition: box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out);
+  }
+  .stat-card:hover {
+    box-shadow: var(--shadow-raised);
+    border-color: hsl(var(--primary) / 0.35);
+  }
+  .progress-ring {
+    @apply relative inline-flex items-center justify-center;
+  }
+  .shadow-glow {
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.4), 0 4px 12px -2px hsl(var(--primary) / 0.3);
+  }
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+  /* rótulo de seção: pequeno, caixa-alta, espaçado — nível "meta" da hierarquia */
+  .eyebrow {
+    @apply text-[11px] font-medium uppercase text-muted-foreground;
+    letter-spacing: 0.08em;
+  }
+}
+
+@layer utilities {
+  .gradient-primary { background: var(--gradient-primary); }
+  .gradient-secondary { background: var(--gradient-secondary); }
+  .gradient-success { background: var(--gradient-success); }
+  .gradient-warning { background: var(--gradient-warning); }
+  .glass { backdrop-filter: blur(12px); background: hsl(var(--card) / 0.8); }
+  .shadow-card { box-shadow: var(--shadow-lift); }
+  .animate-fade-in { animation: fadeIn 0.35s var(--ease-out) forwards; }
+  .animate-slide-up { animation: slideUp 0.35s var(--ease-out) forwards; }
+  .animate-scale-in { animation: scaleIn 0.2s var(--ease-out) forwards; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

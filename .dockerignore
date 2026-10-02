@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+**/*.yaml
+**/*.yml
+**/*.log
+**/*_log.txt
+**/certs
+**/.git
+**/.aws
+**/.codex
+**/.agents

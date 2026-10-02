@@ -1,0 +1,244 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+ 
+}
+
+enum AgentMessageSender {
+  user
+  agent
+  system
+}
+
+model User {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  role      String
+  emTreinamento Boolean @default(false)
+  treinamentoAte DateTime?
+  ativo     Boolean  @default(true)
+  avatar    String?  @db.Text
+  comissaoPercent Float @default(0)
+  teamId    String?
+  permissionClassId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  commercialEntries     CommercialEntry[] @relation("CommercialEntryVendedor")
+  rescueEntries         RescueEntry[]     @relation("RescueEntryCloser")
+  rescueOriginEntries   RescueEntry[]     @relation("RescueEntryVendedorOrigem")
+  trafficEntriesCreated TrafficEntry[]    @relation("TrafficEntryCriadoPor")
+  trafficEntriesAsVendedor TrafficEntry[] @relation("TrafficEntryVendedor")
+  agentConversations    AgentChatConversation[]
+
+  team Team? @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  teamsAsLeader Team[] @relation("TeamLeader")
+  permissionClass PermissionClass? @relation(fields: [permissionClassId], references: [id], onDelete: SetNull)
+}
+
+model PermissionClass {
+  id                String   @id @default(uuid())
+  nome              String   @unique
+  trafficRead       Boolean  @default(false)
+  trafficWrite      Boolean  @default(false)
+  commercialRead    Boolean  @default(false)
+  commercialWrite   Boolean  @default(false)
+  adminMetricsRead  Boolean  @default(false)
+  usersRead         Boolean  @default(false)
+  usersCreate       Boolean  @default(false)
+  usersDeactivate   Boolean  @default(false)
+  otherPermissions  Json
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  users User[]
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  nome      String   @unique
+  leaderId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members User[] @relation("TeamMembers")
+  leader  User? @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: SetNull)
+}
+
+model TeamBonusConfig {
+  id                     String   @id @default("default")
+  minInternalRescuePercent Float  @default(0)
+  leaderBonusEnabled     Boolean  @default(false)
+  leaderBonusPercent     Float    @default(0)
+  rules                  Json
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model AgentConfig {
+  id                 String   @id @default("default")
+  faqWebhookUrl      String?  @db.Text
+  chatWebhookUrl     String?  @db.Text
+  inboundWebhookToken String? @db.Text
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model AgentFaqItem {
+  id        String   @id @default(uuid())
+  question  String   @db.Text
+  answer    String   @db.Text
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AgentChatConversation {
+  id        String   @id @default(uuid())
+  userId    String
+  number    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AgentChatMessage[]
+
+  @@unique([userId, number])
+}
+
+model AgentChatMessage {
+  id             String             @id @default(uuid())
+  conversationId String
+  sender         AgentMessageSender
+  content        String             @db.Text
+  createdAt      DateTime           @default(now())
+
+  conversation AgentChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  nome      String   @unique
+  capaUrl   String?  @db.Text
+  descricao String?  @db.Text
+  preco     Float    @default(0)
+  comissaoPercent Float @default(0)
+  maxDescontoPercent Float @default(0)
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  saleLines CommercialSaleLine[]
+  rescueSaleLines RescueSaleLine[]
+}
+
+model CommercialEntry {
+  id            String   @id @default(uuid())
+  data          DateTime
+  vendedorId    String
+  campaignScope String   @default("geral")
+  campaignName  String?  @db.Text
+  leadsAtendidos Int
+  agendamentos  Int
+  vendas        Int
+  followUps     Int
+  descontoPercent Float?
+  descontoValor Float?
+  valorBruto    Float?
+  valorLiquido  Float?
+  comissao      Float?
+  alunoNome     String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  vendedor  User                 @relation("CommercialEntryVendedor", fields: [vendedorId], references: [id])
+  saleLines CommercialSaleLine[]
+}
+
+model CommercialSaleLine {
+  id        String @id @default(uuid())
+  entryId   String
+  produtoId String
+  quantidade Int
+  precoUnitario Float @default(0)
+
+  entry   CommercialEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  produto Product         @relation(fields: [produtoId], references: [id])
+
+  @@unique([entryId, produtoId])
+}
+
+model TrafficEntry {
+  id          String   @id @default(uuid())
+  produto     String
+  semana      DateTime
+  periodoTipo String   @default("weekly")
+  investimento Float
+  leads       Int
+  cpl         Float
+  vendas      Int
+  receita     Float
+  roi         Float
+  alcance     Int?
+  impressoes  Int?
+  cliques     Int?
+  ctrPercent  Float?
+  cpc         Float?
+  cpm         Float?
+  vendedorId  String?
+  criadoPorId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  criadoPor User @relation("TrafficEntryCriadoPor", fields: [criadoPorId], references: [id])
+  vendedor User? @relation("TrafficEntryVendedor", fields: [vendedorId], references: [id])
+}
+
+model RescueEntry {
+  id              String   @id @default(uuid())
+  data            DateTime
+  closerId        String
+  leadsResgatados Int
+  leadsConvertidos Int
+  vendedorOrigemId String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  closer        User @relation("RescueEntryCloser", fields: [closerId], references: [id])
+  vendedorOrigem User @relation("RescueEntryVendedorOrigem", fields: [vendedorOrigemId], references: [id])
+  saleLines     RescueSaleLine[]
+}
+
+model RescueSaleLine {
+  id        String @id @default(uuid())
+  entryId   String
+  produtoId String
+  quantidade Int
+  precoUnitario Float @default(0)
+
+  entry   RescueEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  produto Product    @relation(fields: [produtoId], references: [id])
+
+  @@unique([entryId, produtoId])
+}
+
+model AbandonmentThresholds {
+  id        String   @id @default("default")
+  amarelo   Int
+  vermelho  Int
+  updatedAt DateTime @updatedAt
+}
+
+model CommercialAwardsConfig {
+  id        String   @id @default("default")
+  period    String   @default("weekly")
+  rules     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
